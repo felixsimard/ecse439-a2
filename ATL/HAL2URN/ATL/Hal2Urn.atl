@@ -1,0 +1,15 @@
+-- paths to metamodels for content assist
+--@path Book=/HAL/model/hal.ecore
+--@path Book=/seg.jUCMNav/src/seg/jUCMNav/emf/urn.ecore
+
+module Hal2Urn;
+create OUT : UCM from IN : HAL;
+
+rule rule2ucm {
+	from 
+		h : HAL!HAL
+	to 
+		u : UCM!URNspec (
+			
+		)
+}
