@@ -1,6 +1,6 @@
 -- paths to metamodels for content assist
---@path HAL=/HAL/model/hal.ecore
---@path URN=/seg.jUCMNav/src/seg/jUCMNav/emf/urn.ecore
+--@path Book=/HAL/model/hal.ecore
+--@path Book=/seg.jUCMNav/src/seg/jUCMNav/emf/urn.ecore
 
 module Hal2Urn;
 create OUT : URN from IN : HAL;

@@ -1,0 +1,40 @@
+  <rules xmi:id="_4tgIYohREeywH-ByDaj1Jw" name="compound">
+    <precondition xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIY4hREeywH-ByDaj1Jw">
+      <LHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIZIhREeywH-ByDaj1Jw" sensor="_4tfhUYhREeywH-ByDaj1Jw" operator="LESSTHAN" comparedAgainstValue="18"/>
+      <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIZYhREeywH-ByDaj1Jw" sensor="_4tfhVYhREeywH-ByDaj1Jw" comparedAgainstValue="closed"/>
+    </precondition>
+    <actions xmi:id="_4tgIZohREeywH-ByDaj1Jw" actuator="_4tfhVIhREeywH-ByDaj1Jw" command="_4tgIgohREeywH-ByDaj1Jw"/>
+  </rules>
+  <rules xmi:id="_4tgIZ4hREeywH-ByDaj1Jw" name="nested">
+    <precondition xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIaIhREeywH-ByDaj1Jw">
+      <LHS xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIaYhREeywH-ByDaj1Jw" operator="OR">
+        <LHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIaohREeywH-ByDaj1Jw" sensor="_4tfhUYhREeywH-ByDaj1Jw" operator="LESSTHAN" comparedAgainstValue="18"/>
+        <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIa4hREeywH-ByDaj1Jw" negated="true" sensor="_4tfhUohREeywH-ByDaj1Jw" operator="GREATERTHANOREQUAL" comparedAgainstValue="18"/>
+      </LHS>
+      <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIbIhREeywH-ByDaj1Jw" sensor="_4tfhVYhREeywH-ByDaj1Jw" comparedAgainstValue="closed"/>
+    </precondition>
+    <actions xmi:id="_4tgIbYhREeywH-ByDaj1Jw" actuator="_4tfhVIhREeywH-ByDaj1Jw" command="_4tgIgohREeywH-ByDaj1Jw"/>
+    <actions xmi:id="_4tgIbohREeywH-ByDaj1Jw" actuator="_4tfhWYhREeywH-ByDaj1Jw" command="_4tgIgohREeywH-ByDaj1Jw"/>
+  </rules>
+  <rules xmi:id="_4tgIb4hREeywH-ByDaj1Jw" name="complex">
+    <precondition xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIcIhREeywH-ByDaj1Jw">
+      <LHS xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIcYhREeywH-ByDaj1Jw" operator="OR">
+        <LHS xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIcohREeywH-ByDaj1Jw" operator="OR">
+          <LHS xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIc4hREeywH-ByDaj1Jw">
+            <LHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIdIhREeywH-ByDaj1Jw" sensor="_4tfhUYhREeywH-ByDaj1Jw" operator="GREATERTHAN" comparedAgainstValue="24"/>
+            <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIdYhREeywH-ByDaj1Jw" sensor="_4tfhV4hREeywH-ByDaj1Jw" operator="GREATERTHAN" comparedAgainstValue="24"/>
+          </LHS>
+          <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIdohREeywH-ByDaj1Jw" sensor="_4tfhUYhREeywH-ByDaj1Jw" operator="GREATERTHAN" comparedAgainstValue="26"/>
+        </LHS>
+        <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgId4hREeywH-ByDaj1Jw" sensor="_4tfhV4hREeywH-ByDaj1Jw" operator="GREATERTHAN" comparedAgainstValue="26"/>
+      </LHS>
+      <RHS xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIeIhREeywH-ByDaj1Jw" operator="OR">
+        <LHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIeYhREeywH-ByDaj1Jw" sensor="_4tfhVYhREeywH-ByDaj1Jw" comparedAgainstValue="closed"/>
+        <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIeohREeywH-ByDaj1Jw" sensor="_4tfhWohREeywH-ByDaj1Jw" comparedAgainstValue="closed"/>
+      </RHS>
+    </precondition>
+    <actions xmi:id="_4tgIe4hREeywH-ByDaj1Jw" actuator="_4tfhVIhREeywH-ByDaj1Jw" command="_4tgvcIhREeywH-ByDaj1Jw"/>
+    <actions xmi:id="_4tgIfIhREeywH-ByDaj1Jw" actuator="_4tfhVYhREeywH-ByDaj1Jw" command="_4tgvcohREeywH-ByDaj1Jw"/>
+    <actions xmi:id="_4tgIfYhREeywH-ByDaj1Jw" actuator="_4tfhWYhREeywH-ByDaj1Jw" command="_4tgvcIhREeywH-ByDaj1Jw"/>
+    <actions xmi:id="_4tgIfohREeywH-ByDaj1Jw" actuator="_4tfhWohREeywH-ByDaj1Jw" command="_4tgvcohREeywH-ByDaj1Jw"/>
+  </rules>
