@@ -1,0 +1,26 @@
+  <rooms xmi:id="_4tfhUIhREeywH-ByDaj1Jw" name="Living Room">
+    <devices xmi:id="_4tfhUYhREeywH-ByDaj1Jw" name="temperature sensor #1" type="_4tgIf4hREeywH-ByDaj1Jw"/>
+    <devices xmi:id="_4tfhUohREeywH-ByDaj1Jw" name="temperature sensor #2" type="_4tgIf4hREeywH-ByDaj1Jw"/>
+    <devices xmi:id="_4tfhU4hREeywH-ByDaj1Jw" name="window" type="_4tgIgIhREeywH-ByDaj1Jw"/>
+    <devices xmi:id="_4tfhVIhREeywH-ByDaj1Jw" name="heater" type="_4tgIgYhREeywH-ByDaj1Jw"/>
+    <devices xmi:id="_4tfhVYhREeywH-ByDaj1Jw" name="window" type="_4tgvcYhREeywH-ByDaj1Jw"/>
+  </rooms>
+  <rooms xmi:id="_4tfhVohREeywH-ByDaj1Jw" name="Kitchen">
+    <devices xmi:id="_4tfhV4hREeywH-ByDaj1Jw" name="temperature sensor #1" type="_4tgIf4hREeywH-ByDaj1Jw"/>
+    <devices xmi:id="_4tfhWIhREeywH-ByDaj1Jw" name="window" type="_4tgIgIhREeywH-ByDaj1Jw"/>
+    <devices xmi:id="_4tfhWYhREeywH-ByDaj1Jw" name="heater" type="_4tgIgYhREeywH-ByDaj1Jw"/>
+    <devices xmi:id="_4tfhWohREeywH-ByDaj1Jw" name="window" type="_4tgvcYhREeywH-ByDaj1Jw"/>
+  </rooms>
+  <rules xmi:id="_4tfhW4hREeywH-ByDaj1Jw" name="simple">
+    <precondition xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIYIhREeywH-ByDaj1Jw" sensor="_4tfhUYhREeywH-ByDaj1Jw" operator="LESSTHAN" comparedAgainstValue="18"/>
+    <actions xmi:id="_4tgIYYhREeywH-ByDaj1Jw" actuator="_4tfhVIhREeywH-ByDaj1Jw" command="_4tgIgohREeywH-ByDaj1Jw"/>
+  </rules> 
+  <types xsi:type="hal:Sensor" xmi:id="_4tgIf4hREeywH-ByDaj1Jw" name="temperature sensor"/>
+  <types xsi:type="hal:Sensor" xmi:id="_4tgIgIhREeywH-ByDaj1Jw" name="window"/>
+  <types xsi:type="hal:Actuator" xmi:id="_4tgIgYhREeywH-ByDaj1Jw" name="heater">
+    <commands xmi:id="_4tgIgohREeywH-ByDaj1Jw" name="turnOnHeating"/>
+    <commands xmi:id="_4tgvcIhREeywH-ByDaj1Jw" name="turnOffHeating"/>
+  </types>
+  <types xsi:type="hal:Actuator" xmi:id="_4tgvcYhREeywH-ByDaj1Jw" name="window">
+    <commands xmi:id="_4tgvcohREeywH-ByDaj1Jw" name="open"/>
+  </types>

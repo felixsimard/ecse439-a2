@@ -5,92 +5,81 @@
 module Hal2Urn;
 create OUT : URN from IN : HAL;
 
-rule hal2ucm {
+rule hal2urn {
 	from 
 		h : HAL!HAL
 	to 
-		u : URN!UCMspec (
+		u : URN!URNspec (
+				
+		),
+		d: URN!URNdefinition (
+			-- set u as parent of d	
+			urnspec <- u
 		)
 	do {
 		thisModule.HAL <- h;
-		u.scenarioGroups <- thisModule.NewScenariogroup(h);
-		for (r in h.rooms) {
-			for (d in r.devices) {
-				u.resources <- thisModule.NewComponent(r, d);
-			}
+			
+		
+		for (roo in h.rooms) {
+			for (dev in roo.devices) {
+				d.components <- thisModule.NewComponent(roo, dev);		
+			}	
 		}
-	}
 	
+	}
+
 }
 
-rule commands2responsibilities {
+-- AutomationRule 2 UCMmap
+rule AutomationRule2UCMmap {
+	from
+		ar: HAL!AutomationRule
+	to
+		um: URN!UCMmap (
+			name <- ar.name,
+			urndefinition <- thisModule.resolveTemp(ar.eContainer(), 'd')
+		),
+		sp: URN!StartPoint (
+				name <- 'checkRule',
+				diagram <- um
+			)
+}
+
+-- Command 2 Responsibility
+rule Command2Responsibility {
 	from 
-		t : HAL!Command
+		com: HAL!Command
 	to
-		r : URN!Responsibility(expression <- t.name)
+		res: URN!Responsibility(
+				name <- com.name,
+				urndefinition <- thisModule.resolveTemp(thisModule.HAL, 'd')
+			)
 }
 
+-- Components
 rule NewComponent(r: HAL!Room, d: HAL!Device) {
-	to
+	to 
 		c: URN!Component(
-			name <- r.name + '.' + d.name
+				name <- r.name + '.' + d.name	
 			)
 	do {
-		c;
+		c;	
 	}
 }
 
-rule NewScenariogroup(h: HAL!HAL) {
+rule AtomicRelationalTerm2Stub {
+	from
+		art: HAL!AtomicRelationalTerm
 	to
-		g: URN!ScenarioGroup
+		st: URN!Stub (
+				diagram <- thisModule.resolveTemp(art.eContainer(), 'um')
+		)
 	do {
-		for (r in h.rules) {
-			g.scenarios <- thisModule.NewScenario(r);
-		}
-		g;
+		st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue;
 	}
 }
 
-rule NewScenario(r: HAL!AutomationRule) {
-	to
-		s: URN!ScenarioDef
-	do {
-		s.name <- r.name;
-		s.startPoints <- thisModule.StartPoint();
-		s.preconditions <- thisModule.Precondition2Conditions(r);
-		s.endPoints <- thisModule.EndPoint();
-		s;	
-	}
-}
 
-rule Precondition2Conditions(p : HAL!AutomationRule) {
-	to
-		c : URN!Condition()
-	do {
-		for (r in thisModule.HAL.rooms) {
-			for (s in r.devices) {
-				if (p.precondition.sensor.name = s.name) {
-					c.expression <- p.precondition.sensor.name + ' IN ' + r.name + ' ' + p.precondition.operator + ' ' + p.precondition.comparedAgainstValue;
-				}
-			}
-			}
-		c;
-	}
-}
 
-rule StartPoint() {
-	to
-		e : URN!ScenarioStartPoint()
-	do {
-		e;	
-	}
-}
 
-rule EndPoint() {
-	to
-		e : URN!ScenarioEndPoint()
-	do {
-		e;	
-	}
-}
 
