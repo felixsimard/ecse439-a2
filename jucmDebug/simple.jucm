@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<urn:URNspec xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ucm.map="http:///ucm/map.ecore" xmlns:urn="http:///urn.ecore" name="URNspec" author="felixsimard" created="March 7, 2022 at 2:58:28 PM EST" modified="March 7, 2022 at 3:43:12 PM EST" specVersion="4" urnVersion="1.27" nextGlobalID="116">
+<urn:URNspec xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ucm.map="http:///ucm/map.ecore" xmlns:urn="http:///urn.ecore" name="URNspec" author="felixsimard" created="March 7, 2022 at 2:58:28 PM EST" modified="March 9, 2022 at 4:17:08 PM EST" specVersion="9" urnVersion="1.27" nextGlobalID="133">
   <ucmspec>
     <scenarioGroups name="ScenarioGroup5" id="5">
       <scenarios name="ScenarioDef6" id="6"/>
@@ -32,19 +32,9 @@
       <nodes xsi:type="ucm.map:RespRef" name="RespRef45" id="45" x="733" y="362" contRef="19" succ="//@urndef/@specDiagrams.0/@connections.2" pred="//@urndef/@specDiagrams.0/@connections.3" respDef="44">
         <label/>
       </nodes>
-      <nodes xsi:type="ucm.map:DirectionArrow" name="DirectionArrow54" id="54" x="504" y="361" succ="//@urndef/@specDiagrams.0/@connections.3" pred="//@urndef/@specDiagrams.0/@connections.1"/>
-      <nodes xsi:type="ucm.map:EmptyPoint" name="EmptyPoint103" id="103" x="366" y="426" succ="//@urndef/@specDiagrams.0/@connections.5" pred="//@urndef/@specDiagrams.0/@connections.4"/>
-      <nodes xsi:type="ucm.map:EndPoint" name="ruleNotTriggered" id="104" x="366" y="486" pred="//@urndef/@specDiagrams.0/@connections.5">
+      <nodes xsi:type="ucm.map:DirectionArrow" name="DirectionArrow54" id="54" x="450" y="361" succ="//@urndef/@specDiagrams.0/@connections.3" pred="//@urndef/@specDiagrams.0/@connections.1"/>
+      <nodes xsi:type="ucm.map:EndPoint" name="ruleNotTriggered" id="104" x="366" y="486" pred="//@urndef/@specDiagrams.0/@connections.4">
         <label deltaX="-6" deltaY="-38"/>
-        <postcondition deltaX="-40" deltaY="-20" label="" expression="true"/>
-      </nodes>
-      <nodes xsi:type="ucm.map:StartPoint" name="RandomStart" id="106" x="299" y="96" succ="//@urndef/@specDiagrams.0/@connections.6">
-        <label/>
-        <precondition deltaX="40" deltaY="-17" label="" expression="true"/>
-      </nodes>
-      <nodes xsi:type="ucm.map:EmptyPoint" name="EmptyPoint107" id="107" x="399" y="96" succ="//@urndef/@specDiagrams.0/@connections.7" pred="//@urndef/@specDiagrams.0/@connections.6"/>
-      <nodes xsi:type="ucm.map:EndPoint" name="Termination" id="108" x="499" y="96" pred="//@urndef/@specDiagrams.0/@connections.7">
-        <label/>
         <postcondition deltaX="-40" deltaY="-20" label="" expression="true"/>
       </nodes>
       <contRefs xsi:type="ucm.map:ComponentRef" name="ComponentRef19" id="19" x="543" y="296" width="317" height="104" contDef="18" nodes="45">
@@ -54,10 +44,7 @@
       <connections xsi:type="ucm.map:NodeConnection" source="41" target="54"/>
       <connections xsi:type="ucm.map:NodeConnection" source="45" target="30"/>
       <connections xsi:type="ucm.map:NodeConnection" source="54" target="45"/>
-      <connections xsi:type="ucm.map:NodeConnection" source="41" target="103"/>
-      <connections xsi:type="ucm.map:NodeConnection" source="103" target="104"/>
-      <connections xsi:type="ucm.map:NodeConnection" source="106" target="107"/>
-      <connections xsi:type="ucm.map:NodeConnection" source="107" target="108"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="41" target="104"/>
     </specDiagrams>
     <components name="Living Room.heater" id="18" contRefs="19"/>
   </urndef>

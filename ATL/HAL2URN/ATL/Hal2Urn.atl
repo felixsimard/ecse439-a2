@@ -5,6 +5,7 @@
 module Hal2Urn;
 create OUT : URN from IN : HAL;
 
+-- HAL to URN
 rule hal2urn {
 	from 
 		h : HAL!HAL
@@ -13,71 +14,142 @@ rule hal2urn {
 				
 		),
 		d: URN!URNdefinition (
-			-- set u as parent of d	
 			urnspec <- u
 		)
 	do {
 		thisModule.HAL <- h;
-			
-		
-		for (roo in h.rooms) {
-			for (dev in roo.devices) {
-				d.components <- thisModule.NewComponent(roo, dev);		
-			}	
-		}
-	
 	}
-
 }
 
--- AutomationRule 2 UCMmap
+-- AutomationRule to UCMmap
 rule AutomationRule2UCMmap {
 	from
 		ar: HAL!AutomationRule
 	to
+		-- UCMmap
 		um: URN!UCMmap (
 			name <- ar.name,
 			urndefinition <- thisModule.resolveTemp(ar.eContainer(), 'd')
 		),
+		-- StartPoint
 		sp: URN!StartPoint (
-				name <- 'checkRule',
-				diagram <- um
-			)
+			name <- 'checkRule',
+			diagram <- um
+		),
+		-- EndPoint
+		epTriggered: URN!EndPoint (
+			name <- 'ruleTriggered',
+			diagram <- um
+		),
+		epNotTriggered: URN!EndPoint (
+			name <- 'ruleNotTriggered',
+			diagram <- um
+		),
+		-- Labels
+		label4StartPoint: URN!NodeLabel (
+			node <- sp
+		),
+		label4epTriggered: URN!NodeLabel (
+			node <- epTriggered
+		),
+		label4epNotTriggered: URN!NodeLabel (
+			node <- epNotTriggered
+		),
+		-- Connections
+		spConnection: URN!NodeConnection (
+			source <- sp,
+			target <- thisModule.resolveTemp(ar.precondition, 'st'),
+			diagram <- um
+		),
+		epTriggeredConnection: URN!NodeConnection (
+			source <- thisModule.resolveTemp(ar.actions.last(), 'respRef'),
+			target <- epTriggered,
+			diagram <- um	
+		),
+		precondition2FirstAction: URN!NodeConnection (
+			source <- thisModule.resolveTemp(ar.precondition, 'st'),
+			target <- thisModule.resolveTemp(ar.actions.first(), 'respRef'),
+			diagram <- um
+		),
+		precondition2epNotTriggered: URN!NodeConnection (
+			source <- thisModule.resolveTemp(ar.precondition, 'st'),
+			target <- epNotTriggered,
+			diagram <- um
+		)
+		--
+		
+	do {
+	
+	
+	}
 }
 
--- Command 2 Responsibility
+
+-- Command to Responsibility
 rule Command2Responsibility {
 	from 
 		com: HAL!Command
 	to
-		res: URN!Responsibility(
+		res: URN!Responsibility (
 				name <- com.name,
 				urndefinition <- thisModule.resolveTemp(thisModule.HAL, 'd')
 			)
 }
 
--- Components
-rule NewComponent(r: HAL!Room, d: HAL!Device) {
-	to 
-		c: URN!Component(
-				name <- r.name + '.' + d.name	
-			)
-	do {
-		c;	
-	}
+-- Actions to ComponentRef
+rule Action2ComponentRef {
+	from 
+		action: HAL!Action
+	to
+		respRef: URN!RespRef (
+			diagram <- thisModule.resolveTemp(action.eContainer(), 'um'),
+			respDef <- thisModule.resolveTemp(action.command, 'res'),
+			contRef <- compRef
+		),
+		compRef: URN!ComponentRef (
+			diagram <- thisModule.resolveTemp(action.eContainer(), 'um'),
+			contDef <- thisModule.resolveTemp(action.actuator, 'comp'),
+			nodes <- respRef,
+			width <- 300,
+			height <- 100
+		),
+		label4respRef: URN!NodeLabel (
+			node <- respRef	
+		),
+		label4compRef: URN!ComponentLabel (
+			contRef <- compRef	
+		)
+
+		
 }
 
+-- Device to Component
+rule Device2Component {
+	from
+		dev: HAL!Device
+	to
+		comp: URN!Component (
+			name <- dev.eContainer().name + '.' + dev.name,
+			urndefinition <- thisModule.resolveTemp(thisModule.HAL, 'd')
+		)
+}
+
+-- AtomicRelationalTerm to Stub
 rule AtomicRelationalTerm2Stub {
 	from
 		art: HAL!AtomicRelationalTerm
 	to
 		st: URN!Stub (
-				diagram <- thisModule.resolveTemp(art.eContainer(), 'um')
+			diagram <- thisModule.resolveTemp(art.eContainer(), 'um')
+		),
+		label4Stub: URN!NodeLabel (
+			node <- st		
 		)
 	do {
 		st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue;
 	}
 }
+
 
 
 

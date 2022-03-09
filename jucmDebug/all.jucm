@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<urn:URNspec xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ucm.map="http:///ucm/map.ecore" xmlns:urn="http:///urn.ecore" name="URNspec" author="felixsimard" created="March 9, 2022 at 12:26:31 PM EST" modified="March 9, 2022 at 12:27:14 PM EST" specVersion="2" urnVersion="1.27" nextGlobalID="60">
+  <ucmspec>
+    <scenarioGroups name="ScenarioGroup5" id="5">
+      <scenarios name="ScenarioDef6" id="6"/>
+    </scenarioGroups>
+  </ucmspec>
+  <grlspec>
+    <groups name="StrategiesGroup3" id="3" strategies="4"/>
+    <strategies name="EvaluationStrategy4" id="4" author="felixsimard" group="3"/>
+    <impactModel/>
+    <indicatorGroup name="Time" id="7" isRedesignCategory="true"/>
+    <indicatorGroup name="Cost" id="8" isRedesignCategory="true"/>
+    <indicatorGroup name="Quality" id="9" isRedesignCategory="true"/>
+    <indicatorGroup name="Flexibility" id="10" isRedesignCategory="true"/>
+    <featureModel/>
+  </grlspec>
+  <urndef>
+    <responsibilities name="turnOnHeating" id="26" respRefs="23 24 46"/>
+    <specDiagrams xsi:type="ucm.map:UCMmap" name="UCMmap2" id="2">
+      <nodes xsi:type="ucm.map:RespRef" name="RespRef45" id="23" x="691" y="307" contRef="30" succ="//@urndef/@specDiagrams.0/@connections.13" pred="//@urndef/@specDiagrams.0/@connections.3" respDef="26">
+        <label deltaX="-22" deltaY="4"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:OrJoin" name="OrJoin171" id="14" x="308" y="303" succ="//@urndef/@specDiagrams.0/@connections.7" pred="//@urndef/@specDiagrams.0/@connections.12 //@urndef/@specDiagrams.0/@connections.8"/>
+      <nodes xsi:type="ucm.map:Stub" name="temperature sensor #1 IN Living Room &lt; 18" id="16" x="199" y="302" succ="//@urndef/@specDiagrams.0/@connections.9 //@urndef/@specDiagrams.0/@connections.4" pred="//@urndef/@specDiagrams.0/@connections.5">
+        <label deltaX="16" deltaY="19"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:OrJoin" name="OrJoin279" id="19" x="229" y="490" succ="//@urndef/@specDiagrams.0/@connections.11" pred="//@urndef/@specDiagrams.0/@connections.1 //@urndef/@specDiagrams.0/@connections.10"/>
+      <nodes xsi:type="ucm.map:EndPoint" name="ruleTriggered" id="25" x="777" y="624" pred="//@urndef/@specDiagrams.0/@connections.6">
+        <label/>
+        <postcondition deltaX="-40" deltaY="-20" label="" expression="true"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:StartPoint" name="checkRule" id="17" x="1" y="302" succ="//@urndef/@specDiagrams.0/@connections.5">
+        <label/>
+        <precondition deltaX="40" deltaY="-17" label="" expression="true"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:Stub" name="NOT (temperature sensor #2 IN Living Room >= 18)" id="18" x="223" y="424" succ="//@urndef/@specDiagrams.0/@connections.10 //@urndef/@specDiagrams.0/@connections.0" pred="//@urndef/@specDiagrams.0/@connections.4">
+        <label deltaX="153" deltaY="-40"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:EndPoint" name="ruleNotTriggered" id="20" x="229" y="564" pred="//@urndef/@specDiagrams.0/@connections.11">
+        <label deltaX="-1" deltaY="-42"/>
+        <postcondition deltaX="-40" deltaY="-20" label="" expression="true"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:DirectionArrow" name="DirectionArrow54" id="22" x="509" y="302" succ="//@urndef/@specDiagrams.0/@connections.3" pred="//@urndef/@specDiagrams.0/@connections.2"/>
+      <nodes xsi:type="ucm.map:RespRef" name="RespRef69" id="24" x="720" y="453" contRef="28" succ="//@urndef/@specDiagrams.0/@connections.6" pred="//@urndef/@specDiagrams.0/@connections.13" respDef="26">
+        <label deltaX="52" deltaY="-4"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:Stub" name="window IN Living Room = closed" id="13" x="459" y="305" succ="//@urndef/@specDiagrams.0/@connections.2 //@urndef/@specDiagrams.0/@connections.1" pred="//@urndef/@specDiagrams.0/@connections.7">
+        <label deltaX="-28" deltaY="10"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:DirectionArrow" name="DirectionArrow190" id="15" x="264" y="301" succ="//@urndef/@specDiagrams.0/@connections.12" pred="//@urndef/@specDiagrams.0/@connections.9"/>
+      <nodes xsi:type="ucm.map:DirectionArrow" name="DirectionArrow188" id="21" x="272" y="353" succ="//@urndef/@specDiagrams.0/@connections.8" pred="//@urndef/@specDiagrams.0/@connections.0"/>
+      <nodes xsi:type="ucm.map:Stub" name="temperature sensor #1 IN Living Room &lt; 18" id="43" x="460" y="139" succ="//@urndef/@specDiagrams.0/@connections.15 //@urndef/@specDiagrams.0/@connections.17" pred="//@urndef/@specDiagrams.0/@connections.14">
+        <label/>
+      </nodes>
+      <nodes xsi:type="ucm.map:RespRef" name="RespRef45" id="46" x="829" y="140" contRef="49" succ="//@urndef/@specDiagrams.0/@connections.16" pred="//@urndef/@specDiagrams.0/@connections.18" respDef="26">
+        <label/>
+      </nodes>
+      <nodes xsi:type="ucm.map:EndPoint" name="ruleTriggered" id="47" x="1020" y="142" pred="//@urndef/@specDiagrams.0/@connections.16">
+        <label/>
+        <postcondition deltaX="-40" deltaY="-20" label="" expression="true"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:EndPoint" name="ruleNotTriggered" id="48" x="469" y="231" pred="//@urndef/@specDiagrams.0/@connections.17">
+        <label deltaX="-6" deltaY="-38"/>
+        <postcondition deltaX="-40" deltaY="-20" label="" expression="true"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:StartPoint" name="checkRule" id="44" x="262" y="139" succ="//@urndef/@specDiagrams.0/@connections.14">
+        <label/>
+        <precondition deltaX="40" deltaY="-17" label="" expression="true"/>
+      </nodes>
+      <nodes xsi:type="ucm.map:DirectionArrow" name="DirectionArrow54" id="45" x="600" y="139" succ="//@urndef/@specDiagrams.0/@connections.18" pred="//@urndef/@specDiagrams.0/@connections.15"/>
+      <contRefs xsi:type="ucm.map:ComponentRef" name="ComponentRef28" id="28" x="611" y="395" width="199" height="107" contDef="27" nodes="24">
+        <label/>
+      </contRefs>
+      <contRefs xsi:type="ucm.map:ComponentRef" name="ComponentRef30" id="30" x="592" y="255" width="173" height="100" contDef="29" nodes="23">
+        <label/>
+      </contRefs>
+      <contRefs xsi:type="ucm.map:ComponentRef" name="ComponentRef49" id="49" x="639" y="74" width="317" height="104" contDef="29" nodes="46">
+        <label/>
+      </contRefs>
+      <connections xsi:type="ucm.map:NodeConnection" source="18" target="21"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="13" target="19"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="13" target="22"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="22" target="23"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="16" target="18"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="17" target="16"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="24" target="25"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="14" target="13"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="21" target="14"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="16" target="15"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="18" target="19"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="19" target="20"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="15" target="14"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="23" target="24"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="44" target="43"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="43" target="45"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="46" target="47"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="43" target="48"/>
+      <connections xsi:type="ucm.map:NodeConnection" source="45" target="46"/>
+    </specDiagrams>
+    <components name="Kitchen.heater" id="27" contRefs="28"/>
+    <components name="Living Room.heater" id="29" contRefs="30 49"/>
+  </urndef>
+  <metadata name="_Use0to100EvaluationRange" value="false"/>
+  <dynamicContexts name="DynamicContext12" id="12" groups="11"/>
+  <dynamicContextGroups name="DynamicContextGroup11" id="11" contexts="12"/>
+  <timepointGroups/>
+</urn:URNspec>
