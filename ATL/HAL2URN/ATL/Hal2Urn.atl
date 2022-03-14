@@ -20,6 +20,38 @@ rule hal2urn {
 		thisModule.HAL <- h;
 	}
 }
+	
+helper def : previous : URN!IURNNode = '';
+helper def : lhs : URN!IURNNode = '';
+helper def : rhs : URN!IURNNode = '';
+--helper def : crts : Sequence(URN!IURNNode) = '';
+
+helper def : ConnectionsDown(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : URN!IURNNode, container : URL!UCMmap) : URN!IURNNode = 
+	if curr.LHS.oclIsTypeOf(HAL!CompoundRelationalTerm) then
+		thisModule.ConnectionsDown(ar, prev, curr.LHS, container)
+	else
+		--curr
+		thisModule.BackUp(ar, curr.LHS, curr.RHS, container)
+	endif
+	;
+
+helper def : BackUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : URN!IURNNode, container : URL!UCMmap) : URN!IURNNode = 
+	if prev.oclIsTypeOf(HAL!AtomicRelationalTerm) and curr.oclIsTypeOf(HAL!AtomicRelationalTerm) then
+		thisModule.previous = thisModule.BackUp(ar, thisModule.NewConnection(prev, curr, container), curr.eContainer(), container)
+	else
+		thisModule.BackUp(ar, thisModule.previous, curr, container)
+	endif
+	;
+	
+helper def : ConnectionsUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : URN!IURNNode, container : URL!UCMmap) : URN!IURNNode = 
+	if curr.eContainer().oclIsTypeOf(HAL!AutomationRule) then
+		curr.eContainer().oclType().debug()
+	else 
+		'up: not an automation rule'.debug()
+		--if curr.eContainer().RHS.oclIsTypeOf(HAL!CompoundRelationalTerm) then
+	endif
+	;
+
 
 -- AutomationRule to UCMmap
 rule AutomationRule2UCMmap {
@@ -54,32 +86,27 @@ rule AutomationRule2UCMmap {
 		),
 		label4epNotTriggered: URN!NodeLabel (
 			node <- epNotTriggered
-		),
-		-- Connections
-		spConnection: URN!NodeConnection (
-			source <- sp,
-			target <- thisModule.resolveTemp(ar.precondition, 'st'),
-			diagram <- um
-		),
-		epTriggeredConnection: URN!NodeConnection (
-			source <- thisModule.resolveTemp(ar.actions.last(), 'respRef'),
-			target <- epTriggered,
-			diagram <- um	
-		),
-		precondition2FirstAction: URN!NodeConnection (
-			source <- thisModule.resolveTemp(ar.precondition, 'st'),
-			target <- thisModule.resolveTemp(ar.actions.first(), 'respRef'),
-			diagram <- um
-		),
-		precondition2epNotTriggered: URN!NodeConnection (
-			source <- thisModule.resolveTemp(ar.precondition, 'st'),
-			target <- epNotTriggered,
-			diagram <- um
 		)
-		--
 		
-	do {
-	
+	do {	
+		
+		-- Connections
+		thisModule.previous <- sp;
+		thisModule.curr;
+		
+		-- Downwards
+		thisModule.curr <- thisModule.ConnectionsDown(ar, thisModule.previous, ar.precondition, um);
+		--thisModule.NewConnection(sp, thisModule.curr.LHS, um);
+		--thisModule.curr.LHS.oclType().debug();
+		--thisModule.previous <- thisModule.curr.LHS;
+		--thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(thisModule.curr.RHS, 'st'), um);
+			
+		-- Upwards
+		-- thisModule.curr.LHS.eContainer().oclType().debug();
+		--thisModule.ConnectionsUp(ar, thisModule.previous, thisModule.curr, um);
+		
+		
+			
 	
 	}
 }
@@ -134,21 +161,65 @@ rule Device2Component {
 		)
 }
 
+
+-- CompoundRelationalTerm to OrJoin
+rule CompoundRelationalTerm2OrJoin {
+	from
+		crt: HAL!CompoundRelationalTerm
+	to
+		oj: URN!OrJoin (
+			diagram <- thisModule.resolveTemp(crt.eContainer(), 'um')
+		)
+	do {
+		
+		
+	}
+}
+
 -- AtomicRelationalTerm to Stub
 rule AtomicRelationalTerm2Stub {
 	from
 		art: HAL!AtomicRelationalTerm
 	to
 		st: URN!Stub (
-			diagram <- thisModule.resolveTemp(art.eContainer(), 'um')
+			diagram <- thisModule.resolveTemp(art.eContainer().eContainer(), 'um')
 		),
 		label4Stub: URN!NodeLabel (
 			node <- st		
 		)
 	do {
-		st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue;
+		
+		if(art.negated = true) {
+			st.name <- 'NOT (' + art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue + ')';	
+		} else {
+			st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue;	
+		}
+		st;
+		
 	}
 }
+
+
+-- Create connections helper method
+rule NewConnection(source : URN!IURNNode, target : URN!IURNNode, container : URN!UCMmap) {
+	to
+		connection: URN!NodeConnection (
+				source <- source,
+				target <- target,
+				diagram <- container
+			)
+	do {
+		'new connection created'.debug();	
+		target;
+	}
+		
+}
+
+
+
+
+
+
 
 
 

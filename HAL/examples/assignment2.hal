@@ -13,10 +13,13 @@
     <devices xmi:id="_4tfhWYhREeywH-ByDaj1Jw" name="heater" type="_4tgIgYhREeywH-ByDaj1Jw"/>
     <devices xmi:id="_4tfhWohREeywH-ByDaj1Jw" name="window" type="_4tgvcYhREeywH-ByDaj1Jw"/>
   </rooms>
-  <rules xmi:id="_4tfhW4hREeywH-ByDaj1Jw" name="simple">
-    <precondition xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIYIhREeywH-ByDaj1Jw" sensor="_4tfhUYhREeywH-ByDaj1Jw" operator="LESSTHAN" comparedAgainstValue="18"/>
-    <actions xmi:id="_4tgIYYhREeywH-ByDaj1Jw" actuator="_4tfhVIhREeywH-ByDaj1Jw" command="_4tgIgohREeywH-ByDaj1Jw"/>
-  </rules> 
+  <rules xmi:id="_4tgIYohREeywH-ByDaj1Jw" name="compound">
+    <precondition xsi:type="hal:CompoundRelationalTerm" xmi:id="_4tgIY4hREeywH-ByDaj1Jw">
+      <LHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIZIhREeywH-ByDaj1Jw" sensor="_4tfhUYhREeywH-ByDaj1Jw" operator="LESSTHAN" comparedAgainstValue="18"/>
+      <RHS xsi:type="hal:AtomicRelationalTerm" xmi:id="_4tgIZYhREeywH-ByDaj1Jw" sensor="_4tfhVYhREeywH-ByDaj1Jw" comparedAgainstValue="closed"/>
+    </precondition>
+    <actions xmi:id="_4tgIZohREeywH-ByDaj1Jw" actuator="_4tfhVIhREeywH-ByDaj1Jw" command="_4tgIgohREeywH-ByDaj1Jw"/>
+  </rules>
   <types xsi:type="hal:Sensor" xmi:id="_4tgIf4hREeywH-ByDaj1Jw" name="temperature sensor"/>
   <types xsi:type="hal:Sensor" xmi:id="_4tgIgIhREeywH-ByDaj1Jw" name="window"/>
   <types xsi:type="hal:Actuator" xmi:id="_4tgIgYhREeywH-ByDaj1Jw" name="heater">
