@@ -38,7 +38,7 @@ helper def : ConnectionsDown(ar: HAL!AutomationRule, prev : URN!IURNNode, curr :
 helper def : BackUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : URN!IURNNode, container : URL!UCMmap) : URN!IURNNode = 
 	if prev.oclIsTypeOf(HAL!AtomicRelationalTerm) and curr.oclIsTypeOf(HAL!AtomicRelationalTerm) then
 		thisModule.previous = thisModule.BackUp(ar, thisModule.NewConnection(prev, curr, container), curr.eContainer(), container)
-	else
+	else 
 		thisModule.BackUp(ar, thisModule.previous, curr, container)
 	endif
 	;
@@ -52,6 +52,29 @@ helper def : ConnectionsUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : U
 	endif
 	;
 
+
+rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURNNode, container : URL!UCMmap, isLeft: Boolean) {
+	do {
+		if (node.oclIsTypeOf(HAL!AtomicRelationalTerm)) {
+			thisModule.resolveTemp(node, 'st').debug();
+			thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(node, 'st'), container);
+			thisModule.previous <- thisModule.resolveTemp(node, 'st');
+			if (parent.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
+				thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.resolveTemp(parent, 'oj'), container);
+				if (isLeft = true) {
+					thisModule.NewConnection(thisModule.resolveTemp(parent, 'oj'), notTriggered, container);
+				}
+			}
+			else{
+				thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), notTriggered, container);
+			}
+		}
+		else if (node.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
+			thisModule.searchTree(node.LHS, node, notTriggered, container, true);
+			thisModule.searchTree(node.RHS, node, notTriggered, container, false);
+		}
+	}
+}
 
 -- AutomationRule to UCMmap
 rule AutomationRule2UCMmap {
@@ -92,10 +115,10 @@ rule AutomationRule2UCMmap {
 		
 		-- Connections
 		thisModule.previous <- sp;
-		thisModule.curr;
+		-- thisModule.curr;
 		
 		-- Downwards
-		thisModule.curr <- thisModule.ConnectionsDown(ar, thisModule.previous, ar.precondition, um);
+		-- thisModule.curr <- thisModule.ConnectionsDown(ar, thisModule.previous, ar.precondition, um);
 		--thisModule.NewConnection(sp, thisModule.curr.LHS, um);
 		--thisModule.curr.LHS.oclType().debug();
 		--thisModule.previous <- thisModule.curr.LHS;
@@ -105,8 +128,14 @@ rule AutomationRule2UCMmap {
 		-- thisModule.curr.LHS.eContainer().oclType().debug();
 		--thisModule.ConnectionsUp(ar, thisModule.previous, thisModule.curr, um);
 		
+		thisModule.searchTree(ar.precondition, '', epNotTriggered, um);
 		
-			
+		for (a in HAL!Action.allInstances()) {
+			thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(a, 'respRef'), um);
+			thisModule.previous <- thisModule.resolveTemp(a, 'respRef');
+		}
+		
+		thisModule.NewConnection(thisModule.previous, epTriggered, um);
 	
 	}
 }
