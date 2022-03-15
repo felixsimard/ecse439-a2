@@ -128,11 +128,13 @@ rule AutomationRule2UCMmap {
 		-- thisModule.curr.LHS.eContainer().oclType().debug();
 		--thisModule.ConnectionsUp(ar, thisModule.previous, thisModule.curr, um);
 		
-		thisModule.searchTree(ar.precondition, '', epNotTriggered, um);
+		thisModule.searchTree(ar.precondition, '', epNotTriggered, um, false);
 		
 		for (a in HAL!Action.allInstances()) {
-			thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(a, 'respRef'), um);
-			thisModule.previous <- thisModule.resolveTemp(a, 'respRef');
+			if (a.eContainer() = ar) {
+				thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(a, 'respRef'), um);
+				thisModule.previous <- thisModule.resolveTemp(a, 'respRef');
+			}
 		}
 		
 		thisModule.NewConnection(thisModule.previous, epTriggered, um);
@@ -217,12 +219,29 @@ rule AtomicRelationalTerm2Stub {
 			node <- st		
 		)
 	do {
+		thisModule.resolveTemp(art.eContainer().eContainer(), 'um').debug();
 		
+		if ( thisModule.resolveTemp(art.eContainer().eContainer().eContainer(), 'um') = OclUndefined ) {
+			if (thisModule.resolveTemp(art.eContainer().eContainer(), 'um') = OclUndefined){
+				st.diagram <- thisModule.resolveTemp(art.eContainer(), 'um');
+			} else {
+				st.diagram <- thisModule.resolveTemp(art.eContainer().eContainer(), 'um');
+			}
+		} else {
+			st.diagram <- thisModule.resolveTemp(art.eContainer().eContainer().eContainer(), 'um');
+		}
+		
+		if (thisModule.resolveTemp(art.eContainer().eContainer(), 'um') = OclUndefined){
+			st.diagram <- thisModule.resolveTemp(art.eContainer(), 'um');
+		} else {
+			st.diagram <- thisModule.resolveTemp(art.eContainer().eContainer(), 'um');
+		}
 		if(art.negated = true) {
 			st.name <- 'NOT (' + art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue + ')';	
 		} else {
 			st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue;	
 		}
+		st.name.debug();
 		st;
 		
 	}
