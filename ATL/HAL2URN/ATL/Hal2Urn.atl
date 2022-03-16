@@ -56,14 +56,34 @@ helper def : ConnectionsUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : U
 rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURNNode, container : URL!UCMmap, isLeft: Boolean) {
 	do {
 		if (node.oclIsTypeOf(HAL!AtomicRelationalTerm)) {
-			thisModule.resolveTemp(node, 'st').debug();
 			thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(node, 'st'), container);
 			thisModule.previous <- thisModule.resolveTemp(node, 'st');
 			if (parent.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
-				thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.resolveTemp(parent, 'oj'), container);
-				if (isLeft = true) {
-					thisModule.NewConnection(thisModule.resolveTemp(parent, 'oj'), notTriggered, container);
+				if (parent.operator = #AND) {
+					thisModule.resolveTemp(parent, 'oj').oclIsTypeOf(URN!OrJoin).debug();
+					thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.resolveTemp(parent, 'oj'), container);
+					if (isLeft = true or (parent.LHS.oclIsTypeOf(HAL!CompoundRelationalTerm) and parent.RHS.oclIsTypeOf(HAL!AtomicRelationalTerm))) {
+						'here4'.debug();
+						thisModule.lastOJ.debug();
+						if (thisModule.lastOJ = OclUndefined) {
+						} else {
+							thisModule.NewConnection(thisModule.lastOJ, thisModule.resolveTemp(parent, 'oj'), container);
+						}
+						thisModule.lastOJ <- thisModule.resolveTemp(parent, 'oj');
+					}
+				} else {
+					if (isLeft = false) {
+						'hihellohere'.debug();
+						thisModule.previous <- thisModule.resolveTemp(parent, 'oj');
+						thisModule.lastOJ <- node;
+						--if (thisModule.lastOJ.oclIsTypeOf(URN!OrJoin)) {
+							--'gothere123'.debug();
+							--thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.lastOJ, container);
+						--}
+					}
+					thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.resolveTemp(parent, 'oj'), container);
 				}
+				
 			}
 			else{
 				thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), notTriggered, container);
@@ -72,6 +92,7 @@ rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURN
 		else if (node.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
 			thisModule.searchTree(node.LHS, node, notTriggered, container, true);
 			thisModule.searchTree(node.RHS, node, notTriggered, container, false);
+			--thisModule.lastOJ <- thisModule.resolveTemp(node, 'oj');
 		}
 	}
 }
@@ -127,9 +148,15 @@ rule AutomationRule2UCMmap {
 		-- Upwards
 		-- thisModule.curr.LHS.eContainer().oclType().debug();
 		--thisModule.ConnectionsUp(ar, thisModule.previous, thisModule.curr, um);
-		
+		thisModule.lastOJ <- OclUndefined;
+		'NEWSEARCH'.debug();
 		thisModule.searchTree(ar.precondition, '', epNotTriggered, um, false);
 		
+		if (thisModule.lastOJ = OclUndefined) {
+			
+		} else {
+			thisModule.NewConnection(thisModule.lastOJ, epNotTriggered, um);
+		}
 		for (a in HAL!Action.allInstances()) {
 			if (a.eContainer() = ar) {
 				thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(a, 'respRef'), um);
@@ -202,8 +229,9 @@ rule CompoundRelationalTerm2OrJoin {
 			diagram <- thisModule.resolveTemp(crt.eContainer(), 'um')
 		)
 	do {
-		
-		
+		if (thisModule.resolveTemp(crt.eContainer(), 'um') = OclUndefined) {
+			oj.diagram <- thisModule.resolveTemp(crt.eContainer().eContainer(), 'um');
+		}		
 	}
 }
 
@@ -219,33 +247,27 @@ rule AtomicRelationalTerm2Stub {
 			node <- st		
 		)
 	do {
-		thisModule.resolveTemp(art.eContainer().eContainer(), 'um').debug();
+		thisModule.resolveTemp(thisModule.getContainer(art), 'um').debug();
+		st.diagram <- thisModule.resolveTemp(thisModule.getContainer(art), 'um');
 		
-		if ( thisModule.resolveTemp(art.eContainer().eContainer().eContainer(), 'um') = OclUndefined ) {
-			if (thisModule.resolveTemp(art.eContainer().eContainer(), 'um') = OclUndefined){
-				st.diagram <- thisModule.resolveTemp(art.eContainer(), 'um');
-			} else {
-				st.diagram <- thisModule.resolveTemp(art.eContainer().eContainer(), 'um');
-			}
-		} else {
-			st.diagram <- thisModule.resolveTemp(art.eContainer().eContainer().eContainer(), 'um');
-		}
-		
-		if (thisModule.resolveTemp(art.eContainer().eContainer(), 'um') = OclUndefined){
-			st.diagram <- thisModule.resolveTemp(art.eContainer(), 'um');
-		} else {
-			st.diagram <- thisModule.resolveTemp(art.eContainer().eContainer(), 'um');
-		}
 		if(art.negated = true) {
 			st.name <- 'NOT (' + art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue + ')';	
 		} else {
 			st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue;	
 		}
-		st.name.debug();
 		st;
 		
 	}
 }
+
+helper def : getContainer(current: HAL!BooleanExpression) : HAL!AutomationRule = 
+	if current.oclIsTypeOf(HAL!AutomationRule)
+	then 
+		current
+	else
+		thisModule.getContainer(current.eContainer())
+	endif;
+	
 
 
 -- Create connections helper method
@@ -257,7 +279,6 @@ rule NewConnection(source : URN!IURNNode, target : URN!IURNNode, container : URN
 				diagram <- container
 			)
 	do {
-		'new connection created'.debug();	
 		target;
 	}
 		
