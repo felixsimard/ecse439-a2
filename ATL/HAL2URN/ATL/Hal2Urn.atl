@@ -56,6 +56,7 @@ helper def : ConnectionsUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : U
 rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURNNode, container : URL!UCMmap, isLeft: Boolean) {
 	do {
 		if (node.oclIsTypeOf(HAL!AtomicRelationalTerm)) {
+			-- 3 1 in, 2 out helpers
 			thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(node, 'st'), container);
 			thisModule.previous <- thisModule.resolveTemp(node, 'st');
 			if (parent.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
@@ -76,10 +77,6 @@ rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURN
 						'hihellohere'.debug();
 						thisModule.previous <- thisModule.resolveTemp(parent, 'oj');
 						thisModule.lastOJ <- node;
-						--if (thisModule.lastOJ.oclIsTypeOf(URN!OrJoin)) {
-							--'gothere123'.debug();
-							--thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.lastOJ, container);
-						--}
 					}
 					thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.resolveTemp(parent, 'oj'), container);
 				}
@@ -91,8 +88,13 @@ rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURN
 		}
 		else if (node.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
 			thisModule.searchTree(node.LHS, node, notTriggered, container, true);
+			-- lhs helpers set
 			thisModule.searchTree(node.RHS, node, notTriggered, container, false);
-			--thisModule.lastOJ <- thisModule.resolveTemp(node, 'oj');
+			-- rhs helpers set
+			
+			--or / and logic
+			
+			-- set new in and outs
 		}
 	}
 }
@@ -229,9 +231,7 @@ rule CompoundRelationalTerm2OrJoin {
 			diagram <- thisModule.resolveTemp(crt.eContainer(), 'um')
 		)
 	do {
-		if (thisModule.resolveTemp(crt.eContainer(), 'um') = OclUndefined) {
-			oj.diagram <- thisModule.resolveTemp(crt.eContainer().eContainer(), 'um');
-		}		
+		oj.diagram <- thisModule.resolveTemp(thisModule.getContainer(crt), 'um');	
 	}
 }
 
