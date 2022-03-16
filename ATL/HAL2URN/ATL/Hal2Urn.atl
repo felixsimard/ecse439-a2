@@ -24,55 +24,58 @@ rule hal2urn {
 helper def : previous : URN!IURNNode = '';
 helper def : lhs : URN!IURNNode = '';
 helper def : rhs : URN!IURNNode = '';
---helper def : crts : Sequence(URN!IURNNode) = '';
-
-helper def : ConnectionsDown(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : URN!IURNNode, container : URL!UCMmap) : URN!IURNNode = 
-	if curr.LHS.oclIsTypeOf(HAL!CompoundRelationalTerm) then
-		thisModule.ConnectionsDown(ar, prev, curr.LHS, container)
-	else
-		--curr
-		thisModule.BackUp(ar, curr.LHS, curr.RHS, container)
-	endif
-	;
-
-helper def : BackUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : URN!IURNNode, container : URL!UCMmap) : URN!IURNNode = 
-	if prev.oclIsTypeOf(HAL!AtomicRelationalTerm) and curr.oclIsTypeOf(HAL!AtomicRelationalTerm) then
-		thisModule.previous = thisModule.BackUp(ar, thisModule.NewConnection(prev, curr, container), curr.eContainer(), container)
-	else 
-		thisModule.BackUp(ar, thisModule.previous, curr, container)
-	endif
-	;
-	
-helper def : ConnectionsUp(ar: HAL!AutomationRule, prev : URN!IURNNode, curr : URN!IURNNode, container : URL!UCMmap) : URN!IURNNode = 
-	if curr.eContainer().oclIsTypeOf(HAL!AutomationRule) then
-		curr.eContainer().oclType().debug()
-	else 
-		'up: not an automation rule'.debug()
-		--if curr.eContainer().RHS.oclIsTypeOf(HAL!CompoundRelationalTerm) then
-	endif
-	;
+helper def : trueOut : URN!IURNNode = '';
+helper def : falseOut : URN!IURNNode = '';
+helper def : inElem : URN!IURNNode = '';
 
 
 rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURNNode, container : URL!UCMmap, isLeft: Boolean) {
 	do {
 		if (node.oclIsTypeOf(HAL!AtomicRelationalTerm)) {
-			thisModule.resolveTemp(node, 'st').debug();
-			thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(node, 'st'), container);
+			-- 3 1 in, 2 out helpers
+			-- set the helpers +
+
+			thisModule.trueOut <- thisModule.resolveTemp(node, 'da');
+			thisModule.inElem <- thisModule.resolveTemp(node, 'st');
+			thisModule.falseOut <- thisModule.resolveTemp(node, 'st');
+				
+			thisModule.NewConnection(thisModule.previous, thisModule.falseOut, container);
+			thisModule.NewConnection(thisModule.previous, thisModule.inElem, container);
+		
+			
+			-- thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(node, 'oj'));
 			thisModule.previous <- thisModule.resolveTemp(node, 'st');
-			if (parent.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
-				thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.resolveTemp(parent, 'oj'), container);
-				if (isLeft = true) {
-					thisModule.NewConnection(thisModule.resolveTemp(parent, 'oj'), notTriggered, container);
-				}
-			}
-			else{
-				thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), notTriggered, container);
-			}
+
 		}
 		else if (node.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
 			thisModule.searchTree(node.LHS, node, notTriggered, container, true);
+			-- lhs helpers set
+			thisModule.lhs <- thisModule.trueOut;
 			thisModule.searchTree(node.RHS, node, notTriggered, container, false);
+			-- rhs helpers set
+			thisModule.rhs <- thisModule.inElem;
+			
+			--or / and logic
+			if(node.operator = #AND) {
+				thisModule.NewConnection(thisModule.lhs, thisModule.rhs, container);
+				-- thisModule.NewConnection(thisModule.falseOut, thisModule.resolveTemp(node, 'oj'), container);
+				-- set new in and outs
+			}
+			
+		
+	
 		}
+	}
+}
+
+-- Create a direction arrow
+rule NewDirectionArrow(container : URN!UCMmap) {
+	to
+		da: URN!DirectionArrow (
+			diagram <- container	
+		)
+	do {
+		da;	
 	}
 }
 
@@ -127,12 +130,19 @@ rule AutomationRule2UCMmap {
 		-- Upwards
 		-- thisModule.curr.LHS.eContainer().oclType().debug();
 		--thisModule.ConnectionsUp(ar, thisModule.previous, thisModule.curr, um);
+		thisModule.lastOJ <- OclUndefined;
+		thisModule.searchTree(ar.precondition, '', epNotTriggered, um, false);
 		
-		thisModule.searchTree(ar.precondition, '', epNotTriggered, um);
-		
+		if (thisModule.lastOJ = OclUndefined) {
+			
+		} else {
+			thisModule.NewConnection(thisModule.lastOJ, epNotTriggered, um);
+		}
 		for (a in HAL!Action.allInstances()) {
-			thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(a, 'respRef'), um);
-			thisModule.previous <- thisModule.resolveTemp(a, 'respRef');
+			if (a.eContainer() = ar) {
+				thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(a, 'respRef'), um);
+				thisModule.previous <- thisModule.resolveTemp(a, 'respRef');
+			}
 		}
 		
 		thisModule.NewConnection(thisModule.previous, epTriggered, um);
@@ -200,8 +210,7 @@ rule CompoundRelationalTerm2OrJoin {
 			diagram <- thisModule.resolveTemp(crt.eContainer(), 'um')
 		)
 	do {
-		
-		
+		oj.diagram <- thisModule.resolveTemp(thisModule.getContainer(crt), 'um');	
 	}
 }
 
@@ -211,12 +220,17 @@ rule AtomicRelationalTerm2Stub {
 		art: HAL!AtomicRelationalTerm
 	to
 		st: URN!Stub (
-			diagram <- thisModule.resolveTemp(art.eContainer().eContainer(), 'um')
+			-- diagram being set in the do block
 		),
 		label4Stub: URN!NodeLabel (
 			node <- st		
+		),
+		da: URN!DirectionArrow (
+			-- diagram being set in the do block
 		)
 	do {
+		st.diagram <- thisModule.resolveTemp(thisModule.getContainer(art), 'um');
+		da.diagram <- thisModule.resolveTemp(thisModule.getContainer(art), 'um');
 		
 		if(art.negated = true) {
 			st.name <- 'NOT (' + art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue + ')';	
@@ -228,6 +242,15 @@ rule AtomicRelationalTerm2Stub {
 	}
 }
 
+helper def : getContainer(current: HAL!BooleanExpression) : HAL!AutomationRule = 
+	if current.oclIsTypeOf(HAL!AutomationRule)
+	then 
+		current
+	else
+		thisModule.getContainer(current.eContainer())
+	endif;
+	
+
 
 -- Create connections helper method
 rule NewConnection(source : URN!IURNNode, target : URN!IURNNode, container : URN!UCMmap) {
@@ -238,12 +261,10 @@ rule NewConnection(source : URN!IURNNode, target : URN!IURNNode, container : URN
 				diagram <- container
 			)
 	do {
-		'new connection created'.debug();	
 		target;
 	}
 		
 }
-
 
 
 
