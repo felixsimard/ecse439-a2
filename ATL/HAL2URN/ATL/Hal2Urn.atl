@@ -32,34 +32,59 @@ helper def : inElem : URN!IURNNode = '';
 rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURNNode, container : URL!UCMmap, isLeft: Boolean) {
 	do {
 		if (node.oclIsTypeOf(HAL!AtomicRelationalTerm)) {
+			if (thisModule.trueOut.oclIsTypeOf(URN!StartPoint)) {
+				thisModule.NewConnection(thisModule.trueOut, thisModule.resolveTemp(node, 'st'), container);
+			}
 			-- 3 1 in, 2 out helpers
 			-- set the helpers +
 
 			thisModule.trueOut <- thisModule.resolveTemp(node, 'da');
+			thisModule.NewConnection(thisModule.resolveTemp(node, 'st'), thisModule.resolveTemp(node, 'da'), container);
 			thisModule.inElem <- thisModule.resolveTemp(node, 'st');
 			thisModule.falseOut <- thisModule.resolveTemp(node, 'st');
 				
-			thisModule.NewConnection(thisModule.previous, thisModule.falseOut, container);
-			thisModule.NewConnection(thisModule.previous, thisModule.inElem, container);
-		
+			--thisModule.NewConnection(thisModule.previous, thisModule.falseOut, container);
+			--thisModule.NewConnection(thisModule.previous, thisModule.inElem, container);
+			--thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(node, 'st'), container);
 			
 			-- thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(node, 'oj'));
-			thisModule.previous <- thisModule.resolveTemp(node, 'st');
+			--thisModule.previous <- thisModule.resolveTemp(node, 'st');
 
 		}
 		else if (node.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
 			thisModule.searchTree(node.LHS, node, notTriggered, container, true);
 			-- lhs helpers set
-			thisModule.lhs <- thisModule.trueOut;
+			thisModule.lhstrue <- thisModule.trueOut;
+			thisModule.lhsin <- thisModule.inElem;
+			thisModule.lhsfalse <- thisModule.falseOut;
+			
 			thisModule.searchTree(node.RHS, node, notTriggered, container, false);
 			-- rhs helpers set
-			thisModule.rhs <- thisModule.inElem;
+			thisModule.rhstrue <- thisModule.trueOut;
+			thisModule.rhsin <- thisModule.inElem;
+			thisModule.rhsfalse <- thisModule.falseOut;
 			
 			--or / and logic
 			if(node.operator = #AND) {
-				thisModule.NewConnection(thisModule.lhs, thisModule.rhs, container);
-				-- thisModule.NewConnection(thisModule.falseOut, thisModule.resolveTemp(node, 'oj'), container);
+				--thisModule.NewConnection(thisModule.NextTrueOut, thisModule.lhsin, container);
+				
+				thisModule.NewConnection(thisModule.lhsfalse, thisModule.resolveTemp(node, 'oj'), container);
+				thisModule.NewConnection(thisModule.lhstrue, thisModule.rhsin, container);
+				thisModule.NewConnection(thisModule.rhsfalse, thisModule.resolveTemp(node, 'oj'), container);
+				
+				thisModule.NextFalseOut <- thisModule.resolveTemp(node, 'oj');
+				thisModule.NextTrueOut <- thisModule.rhstrue;
 				-- set new in and outs
+			}
+			if (node.operator = #OR) {
+				--thisModule.NewConnection(thisModule.NextTrueOut, thisModule.lhsin, container);
+				--thisModule.NewConnection(thisModule.NextFalseOut, thisModule.rhsfalse, container);
+				thisModule.NewConnection(thisModule.lhstrue, thisModule.resolveTemp(node, 'oj'), container);
+				thisModule.NewConnection(thisModule.rhstrue, thisModule.resolveTemp(node, 'oj'), container);
+				thisModule.NewConnection(thisModule.lhsfalse, thisModule.rhsin, container);
+				
+				thisModule.NextTrueOut <- thisModule.resolveTemp(node, 'oj');
+				thisModule.NextFalseOut <- thisModule.rhsfalse;
 			}
 			
 		
@@ -118,6 +143,10 @@ rule AutomationRule2UCMmap {
 		
 		-- Connections
 		thisModule.previous <- sp;
+		
+		thisModule.trueOut <- sp;
+		thisModule.NextTrueOut <- OclUndefined;
+		thisModule.NextFalseOut <- OclUndefined;
 		-- thisModule.curr;
 		
 		-- Downwards
@@ -130,22 +159,25 @@ rule AutomationRule2UCMmap {
 		-- Upwards
 		-- thisModule.curr.LHS.eContainer().oclType().debug();
 		--thisModule.ConnectionsUp(ar, thisModule.previous, thisModule.curr, um);
-		thisModule.lastOJ <- OclUndefined;
+		
 		thisModule.searchTree(ar.precondition, '', epNotTriggered, um, false);
 		
-		if (thisModule.lastOJ = OclUndefined) {
-			
+		if (thisModule.NextFalseOut = OclUndefined) {
+			thisModule.NewConnection(thisModule.falseOut, epNotTriggered, um);
 		} else {
-			thisModule.NewConnection(thisModule.lastOJ, epNotTriggered, um);
+			thisModule.NewConnection(thisModule.NextFalseOut, epNotTriggered, um);
 		}
+		
+		--thisModule.NewConnection(thisModule.previous, thisModule.trueOut, um);
+		--thisModule.previous <- thisModule.trueOut;
 		for (a in HAL!Action.allInstances()) {
 			if (a.eContainer() = ar) {
-				thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(a, 'respRef'), um);
-				thisModule.previous <- thisModule.resolveTemp(a, 'respRef');
+				thisModule.NewConnection(thisModule.trueOut, thisModule.resolveTemp(a, 'respRef'), um);
+				thisModule.trueOut <- thisModule.resolveTemp(a, 'respRef');
 			}
 		}
 		
-		thisModule.NewConnection(thisModule.previous, epTriggered, um);
+		thisModule.NewConnection(thisModule.trueOut, epTriggered, um);
 	
 	}
 }
