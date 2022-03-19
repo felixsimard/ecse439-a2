@@ -1,4 +1,9 @@
--- paths to metamodels for content assist
+-- ECSE 439: Assignment 2
+-- March 25th, 2022
+-- Brendan Marks (260866323)
+-- Felix Simard (260865674)
+
+
 --@path HAL=/HAL/model/hal.ecore
 --@path URN=/seg.jUCMNav/src/seg/jUCMNav/emf/urn.ecore
 
@@ -21,6 +26,7 @@ rule hal2urn {
 	}
 }
 	
+-- Global helper variables
 helper def : previous : URN!IURNNode = '';
 helper def : lhs : URN!IURNNode = '';
 helper def : rhs : URN!IURNNode = '';
@@ -29,6 +35,7 @@ helper def : falseOut : URN!IURNNode = '';
 helper def : inElem : URN!IURNNode = '';
 
 
+-- Create connections
 rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURNNode, container : URL!UCMmap, isLeft: Boolean) {
 	do {
 		if (node.oclIsTypeOf(HAL!AtomicRelationalTerm)) {
@@ -42,8 +49,7 @@ rule searchTree(node: URN!IURNNode, parent: URN!IURNNode, notTriggered: URN!IURN
 			thisModule.inElem <- thisModule.resolveTemp(node, 'st');
 			thisModule.falseOut <- thisModule.resolveTemp(node, 'st');
 
-		}
-		else if (node.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
+		} else if (node.oclIsTypeOf(HAL!CompoundRelationalTerm)) {
 			thisModule.searchTree(node.LHS, node, notTriggered, container, true);
 			-- lhs helpers set
 			thisModule.lhstrue <- thisModule.trueOut;
@@ -161,34 +167,20 @@ rule AutomationRule2UCMmap {
 		thisModule.NextFalseOut <- OclUndefined;
 		
 		thisModule.stack <- Sequence{};
-		
-		-- thisModule.curr;
-		
-		-- Downwards
-		-- thisModule.curr <- thisModule.ConnectionsDown(ar, thisModule.previous, ar.precondition, um);
-		--thisModule.NewConnection(sp, thisModule.curr.LHS, um);
-		--thisModule.curr.LHS.oclType().debug();
-		--thisModule.previous <- thisModule.curr.LHS;
-		--thisModule.NewConnection(thisModule.previous, thisModule.resolveTemp(thisModule.curr.RHS, 'st'), um);
-			
-		-- Upwards
-		-- thisModule.curr.LHS.eContainer().oclType().debug();
-		--thisModule.ConnectionsUp(ar, thisModule.previous, thisModule.curr, um);
-		
 		thisModule.searchTree(ar.precondition, OclUndefined, epNotTriggered, um, OclUndefined);
 		
 		thisModule.NewConnection(thisModule.falseOut, epNotTriggered, um);
 	
 		
-		--thisModule.NewConnection(thisModule.previous, thisModule.trueOut, um);
-		--thisModule.previous <- thisModule.trueOut;
+		-- Connect actions sequentially one after the other
 		for (a in HAL!Action.allInstances()) {
 			if (a.eContainer() = ar) {
 				thisModule.NewConnection(thisModule.trueOut, thisModule.resolveTemp(a, 'respRef'), um);
 				thisModule.trueOut <- thisModule.resolveTemp(a, 'respRef');
 			}
 		}
-		
+			
+		-- Connect last action to ruleTriggered termination point
 		thisModule.NewConnection(thisModule.trueOut, epTriggered, um);
 	
 	}
@@ -229,7 +221,6 @@ rule Action2ComponentRef {
 		label4compRef: URN!ComponentLabel (
 			contRef <- compRef	
 		)
-
 		
 }
 
@@ -277,15 +268,38 @@ rule AtomicRelationalTerm2Stub {
 		da.diagram <- thisModule.resolveTemp(thisModule.getContainer(art), 'um');
 		
 		if(art.negated = true) {
-			st.name <- 'NOT (' + art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue + ')';	
+			st.name <- 'NOT (' + art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + thisModule.getOperatorSymbol(art.operator) + ' ' + art.comparedAgainstValue + ')';	
 		} else {
-			st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + art.operator + ' ' + art.comparedAgainstValue;	
+			st.name <- art.sensor.name + ' IN ' + art.sensor.eContainer().name + ' ' + thisModule.getOperatorSymbol(art.operator) + ' ' + art.comparedAgainstValue;	
+			
 		}
 		st;
 		
 	}
 }
 
+-- Convert word operator to operator symbol (eg: LESSTHAN : <)
+rule getOperatorSymbol(operator: String) {
+	do {
+		thisModule.operatorSymbol <- '';
+		if(operator = #EQUAL) {
+			thisModule.operatorSymbol <- '=';
+		} else if(operator = #NOTEQUAL) {
+			thisModule.operatorSymbol <- '!=';
+		} else if(operator = #LESSTHAN) {
+			thisModule.operatorSymbol <-  '<';
+		} else if(operator = #LESSTHANOREQUAL) {
+			thisModule.operatorSymbol <- '<=';	
+		} else if(operator = #GREATERTHAN) {
+			thisModule.operatorSymbol <- '>';	
+		} else {
+			thisModule.operatorSymbol <- '>=';	
+		}
+		thisModule.operatorSymbol;
+	}
+}
+
+-- Traverse containement of BooleanExpression(s) to find closest container of a given BooleanExpression
 helper def : getContainer(current: HAL!BooleanExpression) : HAL!AutomationRule = 
 	if current.oclIsTypeOf(HAL!AutomationRule)
 	then 
@@ -309,14 +323,4 @@ rule NewConnection(source : URN!IURNNode, target : URN!IURNNode, container : URN
 	}
 		
 }
-
-
-
-
-
-
-
-
-
-
 
